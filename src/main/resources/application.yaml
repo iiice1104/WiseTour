@@ -18,6 +18,21 @@ spring:
         max-idle: 10
         min-idle: 1
         time-between-eviction-runs: 10s
+  spring:
+    rabbitmq: #test
+      host: localhost
+      port: 5672
+      username: guest
+      password: guest
+      virtual-host: /
+      listener:
+        simple:
+          retry:
+            enabled: true           # 开启消费者自动重试
+            max-attempts: 3         # 最大重试3次（1次正常消费+2次重试）
+            initial-interval: 1000ms # 重试间隔
+            multiplier: 2.0         # 间隔倍数(1s, 2s)
+          default-requeue-rejected: false # 重试耗尽后拒绝消息，直接投递到死信队列
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 mybatis-plus:
