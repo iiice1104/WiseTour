@@ -5,7 +5,8 @@ import com.wisetour.service.IVoucherOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import com.wisetour.config.KafkaConfig;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -24,9 +25,9 @@ public class VoucherOrderListener {
      * 监听秒杀订单队列
      * RabbitMQ 会在有消息进入 "seckill.queue" 时自动调用此方法
      */
-    @RabbitListener(queues = "seckill.queue")
+    @KafkaListener(topics = KafkaConfig.SECKILL_TOPIC, groupId = "wisetour-seckill-group")
     public void listenSeckillOrder(VoucherOrder voucherOrder) {
-        log.info("从 RabbitMQ 接收到秒杀订单，订单号: {}", voucherOrder.getId());
+        log.info("从 Kafka 接收到秒杀订单，订单号: {}", voucherOrder.getId());
 
         // 1. 获取锁（分布式锁确保幂等性，防止数据库重复写入）
         Long userId = voucherOrder.getUserId();
@@ -58,8 +59,8 @@ public class VoucherOrderListener {
      * 死信队列监听
      * @param voucherOrder
      */
-    @RabbitListener(queues = "dlx.queue")
-    public void listenDlxOrder(VoucherOrder voucherOrder){
+    @KafkaListener(topics = KafkaConfig.SECKILL_DLT, groupId = "wisetour-dlt-group")
+    public void listenDltOrder(VoucherOrder voucherOrder) {
         log.error("发现死信订单！该订单经多次重试下单失败，需人工处理。订单ID: {}, 用户ID: {}",
                 voucherOrder.getId(), voucherOrder.getUserId());
     }

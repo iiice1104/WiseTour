@@ -12,7 +12,8 @@ import com.wisetour.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.wisetour.config.KafkaConfig;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.stream.*;
@@ -57,7 +58,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private RedissonClient redissonClient;
 
     @Resource
-    private RabbitTemplate rabbitTemplate;
+    private KafkaTemplate<String, VoucherOrder> kafkaTemplate;
 
     private static final DefaultRedisScript<Long> SECKILL_SCRIPT;
     static {
@@ -66,9 +67,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         SECKILL_SCRIPT.setResultType(Long.class);
     }
 
-    // 定义 RabbitMQ 的交换机和 RoutingKey
-    private static final String SECKILL_EXCHANGE = "seckill.exchange";
-    private static final String SECKILL_ROUTING_KEY = "seckill.order";
+    private static final String SECKILL_TOPIC = KafkaConfig.SECKILL_TOPIC;
 
     //线程池
     private static final ExecutorService SECKILL_ORDER_EXECUTOR = Executors.newSingleThreadExecutor();
@@ -217,9 +216,8 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         voucherOrder.setUserId(userId);
         voucherOrder.setVoucherId(voucherId);
 
-        // 5. 发送订单消息到 RabbitMQ
-        // 注意：这里不需要再获取代理对象执行异步方法，直接发消息给 MQ 即可
-        rabbitTemplate.convertAndSend(SECKILL_EXCHANGE, SECKILL_ROUTING_KEY, voucherOrder);
+        // 5. 发送订单消息到 Kafka，异步削峰
+        kafkaTemplate.send(SECKILL_TOPIC, voucherOrder);
 
         // 6. 返回订单 ID
         return Result.ok(orderId);
