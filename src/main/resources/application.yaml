@@ -29,7 +29,12 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       auto-offset-reset: earliest
       properties:
-        spring.json.trusted.packages: "com.wisetour.entity"
+        spring.json.trusted.packages: "com.wisetour.entity,com.wisetour.dto"
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
+      username: elastic
+      password: wisetour@2024
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 mybatis-plus:
