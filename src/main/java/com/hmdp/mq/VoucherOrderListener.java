@@ -60,7 +60,7 @@ public class VoucherOrderListener {
      */
     @RabbitListener(queues = "dlx.queue")
     public void listenDlxOrder(VoucherOrder voucherOrder){
-        log.error("【警告】发现死信订单！该订单经多次重试下单失败，需人工处理。订单ID: {}, 用户ID: {}",
+        log.error("发现死信订单！该订单经多次重试下单失败，需人工处理。订单ID: {}, 用户ID: {}",
                 voucherOrder.getId(), voucherOrder.getUserId());
     }
 }
