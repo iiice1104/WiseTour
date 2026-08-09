@@ -37,6 +37,12 @@ spring:
       password: wisetour@2024
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
+# AI Agent 配置（使用 OpenAI 兼容接口，可替换为 DeepSeek / 通义千问）
+wisetour:
+  ai:
+    api-key: sk-wisetour-replace-with-real-key
+    base-url: https://api.deepseek.com/v1   # DeepSeek OpenAI 兼容端点
+    model-name: deepseek-chat
 mybatis-plus:
   type-aliases-package: com.wisetour.entity # 别名扫描包
 logging:

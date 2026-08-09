@@ -91,6 +91,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
+        <!-- LangChain4j: AI Agent 框架，支持 Tool Calling、对话记忆、ReAct 模式 -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j</artifactId>
+            <version>0.27.1</version>
+        </dependency>
+        <!-- OpenAI 兼容客户端，可接入 DeepSeek / 通义千问等兼容 API -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>0.27.1</version>
+        </dependency>
         <!--  elasticsearch  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
